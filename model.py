@@ -10,6 +10,7 @@ import torchvision.models as models
 
 # Path to data files - in this tutorial I use PyTorch's generic loaders
 # Data is arranged like this root/train_or_test_folder/class_folder
+# If you'd liek to structured your daat difrrently, rewrite this part
 
 data_dir = "../brazilian_vs_domestic/data/"
 train_dir = data_dir + "train/"
@@ -42,23 +43,15 @@ test_transforms = transforms.Compose(
     ]
 )
 
-train_data = datasets.ImageFolder(
-    train_dir, train_transforms
-)
+train_data = datasets.ImageFolder(train_dir, train_transforms)
 test_data = datasets.ImageFolder(test_dir, test_transforms)
 
-train_loader = torch.utils.data.DataLoader(
-    train_data, batch_size=64, shuffle=True
-)
-test_loader = torch.utils.data.DataLoader(
-    test_data, batch_size=32
-)
+train_loader = torch.utils.data.DataLoader(train_data, batch_size=64, shuffle=True)
+test_loader = torch.utils.data.DataLoader(test_data, batch_size=32)
 
 
 # Use GPU if available
-device = torch.device(
-    "cuda" if torch.cuda.is_available() else "cpu"
-)
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Download pretrained model - I use VGG19 architecture, but you can try other ones
 vgg19 = models.vgg19(pretrained=True)
@@ -94,9 +87,7 @@ model.to(device)
 
 criterion = nn.NLLLoss()
 
-optimizer = optim.Adam(
-    model.classifier.parameters(), lr=0.003
-)
+optimizer = optim.Adam(model.classifier.parameters(), lr=0.003)
 
 
 def train_model(epochs):
@@ -108,10 +99,7 @@ def train_model(epochs):
         for inputs, labels in train_loader:
             steps += 1
             # Send inputs and labels to selected device
-            inputs, labels = (
-                inputs.to(device),
-                labels.to(device),
-            )
+            inputs, labels = (inputs.to(device), labels.to(device))
 
             optimizer.zero_grad()
 
@@ -128,26 +116,17 @@ def train_model(epochs):
                 model.eval()
                 with torch.no_grad():
                     for inputs, labels in test_loader:
-                        inputs, labels = (
-                            inputs.to(device),
-                            labels.to(device),
-                        )
+                        inputs, labels = (inputs.to(device), labels.to(device))
                         logps = model.forward(inputs)
-                        batch_loss = criterion(
-                            logps, labels
-                        )
+                        batch_loss = criterion(logps, labels)
 
                         test_loss += batch_loss.item()
 
                         # Compute metric - accuracy
                         ps = torch.exp(logps)
                         top_p, top_class = ps.topk(1, dim=1)
-                        equals = top_class == labels.view(
-                            *top_class.shape
-                        )
-                        accuracy += torch.mean(
-                            equals.type(torch.FloatTensor)
-                        ).item()
+                        equals = top_class == labels.view(*top_class.shape)
+                        accuracy += torch.mean(equals.type(torch.FloatTensor)).item()
 
                 print(
                     f"Epoch {epoch+1}/{epochs}.. "
