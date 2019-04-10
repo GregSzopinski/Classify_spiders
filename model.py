@@ -10,7 +10,7 @@ import torchvision.models as models
 
 # Path to data files - in this tutorial I use PyTorch's generic loaders
 # Data is arranged like this root/train_or_test_folder/class_folder
-# If you'd like to structured your daat difrrently, rewrite this part
+# If you'd like to structured your data difrrently, rewrite this part
 
 data_dir = "../brazilian_vs_domestic/data/"
 train_dir = data_dir + "train/"
